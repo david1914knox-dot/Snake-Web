@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Private Snake Hub</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; text-align: center; background: #1a1a1a; color: #fff; padding-top: 50px; }
+        .btn { padding: 10px 20px; margin: 5px; cursor: pointer; border: none; border-radius: 5px; background: #333; color: white; transition: 0.3s; }
+        .btn:hover { background: #555; }
+        #start-btn { background: #28a745; font-size: 1.2rem; margin-top: 20px; }
+        #start-btn:hover { background: #218838; }
+        .lang-menu { margin-bottom: 30px; }
+        
+        #helpModal { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.95); overflow-y:auto; z-index:1000; }
+        .modal-content { max-width: 800px; margin: 50px auto; padding: 20px; text-align: left; }
+        .step { margin-bottom: 30px; border-bottom: 1px solid #444; padding-bottom: 10px; }
+        .step img { width: 100%; border-radius: 10px; margin: 15px 0; border: 1px solid #555; }
+        .step p { font-size: 1.1rem; line-height: 1.6; }
+        .close-btn { float:right; color:white; background:none; border:1px solid white; cursor:pointer; padding: 5px 10px; }
+    </style>
+</head>
+<body>
+
+    <div class="lang-menu">
+        <button class="btn" onclick="setLang('en')">EN</button>
+        <button class="btn" onclick="setLang('zh')">中</button>
+        <button class="btn" onclick="setLang('ja')">日</button>
+        <button class="btn" onclick="setLang('ko')">한</button>
+        <button class="btn" onclick="setLang('de')">DE</button>
+        <button class="btn" onclick="setLang('es')">ES</button>
+        <button class="btn" onclick="setLang('it')">IT</button>
+        <button class="btn" onclick="setLang('fr')">FR</button>
+    </div>
+
+    <h1 id="title">Snake Game</h1>
+    <p id="msg">Detecting language...</p>
+    
+    <button id="start-btn" class="btn">START</button>
+    <br>
+    <button id="help-btn" class="btn" onclick="openHelp()">HELP</button>
+    
+    <div id="helpModal">
+        <div class="modal-content">
+            <button onclick="closeHelp()" class="close-btn">CLOSE ×</button>
+            <h1 id="help-title" style="color:#4CAF50;">Snake Game Guide</h1>
+
+            <div class="step">
+                <img src="assets/step1.png" alt="Step 1">
+                <p id="step-01"></p>
+            </div>
+            <div class="step">
+                <img src="assets/step2.png" alt="Step 2">
+                <p id="step-02"></p>
+            </div>
+            <div class="step">
+                <img src="assets/step3.png" alt="Step 3">
+                <p id="step-03"></p>
+            </div>
+            <div class="step">
+                <img src="assets/step4.png" alt="Step 4">
+                <p id="step-04"></p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const i18n = {
+            'en': { 
+                title: 'Snake Game', msg: 'Welcome back!', start: 'START', help: 'HELP',
+                hTitle: 'Snake Game Guide',
+                s1: '01: Click the START button to begin the game.',
+                s2: '02: Use arrow keys (Up, Down, Left, Right) to control the snake and eat food.',
+                s3: '03: You can change the colors of the snake and food in SETTINGS.',
+                s4: '04: Check "What\'s New" and "About" in the HELP menu for updates.'
+            },
+            'zh': { 
+                title: '贪吃蛇', msg: '欢迎回来！', start: '开始游戏', help: '帮助说明',
+                hTitle: '贪吃蛇游戏指南',
+                s1: '01：按 START 按钮开始游戏。',
+                s2: '02：通过上下左右按键控制蛇吃食物。',
+                s3: '03：在 SETTINGS（设置）里可以给蛇和食物换颜色。',
+                s4: '04：你可以在 HELP（帮助）里查看我们的更新内容还有关于我们的这款游戏。'
+            },
+            'ja': { 
+                title: 'スネーク', msg: 'おかえり！', start: 'スタート', help: 'ヘルプ',
+                hTitle: 'スネークゲームガイド',
+                s1: '01：STARTボタンを押してゲームを開始します。',
+                s2: '02：矢印キー（上下左右）でヘビを操作してエサを食べます。',
+                s3: '03：SETTINGS（設定）でヘビとエサの色を変更できます。',
+                s4: '04：HELPメニューの更新内容やアバウトで詳細を確認できます。'
+            },
+            'ko': { 
+                title: '스네이크', msg: '환영합니다!', start: '시작', help: '도움말',
+                hTitle: '스네이크 게임 가이드',
+                s1: '01: START 버튼을 눌러 게임을 시작하세요.',
+                s2: '02: 상하좌우 방향키를 사용하여 뱀을 조종하고 먹이를 먹으세요.',
+                s3: '03: SETTINGS(설정)에서 뱀과 먹이의 색상을 변경할 수 있습니다.',
+                s4: '04: HELP 메뉴에서 업데이트 내용과 게임 정보를 확인할 수 있습니다.'
+            },
+            'de': { 
+                title: 'Schlange', msg: 'Willkommen!', start: 'START', help: 'HILFE',
+                hTitle: 'Schlange Spielanleitung',
+                s1: '01: Drücke den START-Button, um das Spiel zu beginnen.',
+                s2: '02: Steuere die Schlange mit den Pfeiltasten, um Futter zu fressen.',
+                s3: '03: In den SETTINGS kannst du die Farben der Schlange und des Futters ändern.',
+                s4: '04: Unter HELP findest du Updates und Informationen über das Spiel.'
+            },
+            'es': { 
+                title: 'Serpiente', msg: '¡Bienvenido!', start: 'INICIO', help: 'AYUDA',
+                hTitle: 'Guía del Juego de la Serpiente',
+                s1: '01: Presiona el botón START para comenzar el juego.',
+                s2: '02: Usa las flechas para controlar la serpiente y comer.',
+                s3: '03: En SETTINGS puedes cambiar los colores de la serpiente y la comida.',
+                s4: '04: Puedes ver las actualizaciones y "Acerca de" en el menú HELP.'
+            },
+            'it': { 
+                title: 'Serpente', msg: 'Benvenuto!', start: 'INIZIO', help: 'AIUTO',
+                hTitle: 'Guida al Gioco del Serpente',
+                s1: '01: Premi il pulsante START per iniziare il gioco.',
+                s2: '02: Usa le frecce direzionali per controllare il serpente e mangiare.',
+                s3: '03: In SETTINGS puoi cambiare i colori del serpente e del cibo.',
+                s4: '04: Controlla le novità e le informazioni sul gioco nel menu HELP.'
+            },
+            'fr': { 
+                title: 'Serpent', msg: 'Bienvenue !', start: 'DÉMARRER', help: 'AIDE',
+                hTitle: 'Guide du Jeu du Serpent',
+                s1: '01: Appuyez sur le bouton START pour commencer.',
+                s2: '02: Utilisez les flèches pour diriger le serpent et manger la nourriture.',
+                s3: '03: Dans SETTINGS, vous pouvez changer les couleurs du serpent et de la nourriture.',
+                s4: '04: Consultez les mises à jour et à propos du jeu dans le menu AIDE.'
+            }
+        };
+
+        function updateUI(lang) {
+            const d = i18n[lang] || i18n['en'];
+            
+            document.getElementById('title').innerText = d.title;
+            document.getElementById('msg').innerText = d.msg;
+            document.getElementById('start-btn').innerText = d.start;
+            document.getElementById('help-btn').innerText = d.help;
+          
+            document.getElementById('help-title').innerText = d.hTitle;
+            document.getElementById('step-01').innerText = d.s1;
+            document.getElementById('step-02').innerText = d.s2;
+            document.getElementById('step-03').innerText = d.s3;
+            document.getElementById('step-04').innerText = d.s4;
+            
+            document.documentElement.lang = lang;
+        }
+
+        function setLang(l) { 
+            localStorage.setItem('myLang', l); 
+            updateUI(l); 
+        }
+
+        function openHelp() {
+            document.getElementById('helpModal').style.display = 'block';
+        }
+
+        function closeHelp() {
+            document.getElementById('helpModal').style.display = 'none';
+        }
+
+        window.onload = () => {
+            const savedLang = localStorage.getItem('myLang');
+            const sysLang = navigator.language.split('-')[0];
+            updateUI(savedLang || sysLang);
+        };
+    </script>
+</body>
+</html>
